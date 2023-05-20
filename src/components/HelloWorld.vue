@@ -37,74 +37,76 @@ export default {
   name: 'HelloWorld',
   created(){
     this.fetchAllUsers();
+     //this.fetchUserRankings();
   },
   methods:{
     async  fetchAllUsers() {
-      const currentDate = new Date();
-      const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-      const sinceDate = firstDayOfMonth.toISOString();
-      let page = 1;
-      const perPage = 100;
+    
+  const currentDate = new Date();
+  const sinceDate = currentDate.toISOString();
+  let page = 1;
+  const perPage = 100;
+ 
+
+  // Add cache control headers to disable caching
+  const headers = {
+    'Accept': 'application/vnd.github.v10+json',
+    'Authorization': 'Bearer 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',
+    //'Cache-Control': 'no-cache',
+    //'Pragma': 'no-cache',
+  };
       /*const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
       const requestDelay = 500;*/
- 
-   
+
+     // https://github.com/gayanvoice/top-github-users
       const response = await axios.get('https://api.github.com/search/users', {
         params: {
-         /* //q:"TalelMejri"
+            q: 'location:Tunisia type:user',
+            sort: 'commits',
+           // sort:"repositories",
+            //sort:"contributions",
+            order: 'desc',
+            per_page: 100,
+            /*page:1,*/
+            since:sinceDate
+        },
+        headers:headers
+      });
+           // await delay(requestDelay); 
+      //this.AllUser = this.AllUser.concat(response.data.items);
+      this.AllUser=response.data.items;
+      //  if (this.AllUser.length < perPage || page==10) {
+      //    break; 
+      //  }
+      //  page++;
+      
+    /* //q:"TalelMejri"
           q: 'location:Tunisia',
           per_page: perPage,
           sort:"commits",
           //sort:"contributions",
           page,*/
+},
+async fetchUserRankings() {
+      try {
+        const currentDate = new Date();
+        const sinceDate = currentDate.toISOString();
+
+        const response = await axios.get('https://api.github.com/search/users', {
+          params: {
             q: 'location:Tunisia type:user',
-           // sort: 'commits',
-           // sort:"repositories",
-            sort:"contributions",
+            sort: 'commits',
             order: 'desc',
             per_page: 100,
             since: sinceDate,
-            page:1
-        },
-        headers: {
-          Accept: 'application/vnd.github.v10+json',
-          Authorization: 'Bearer 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',
-        },
-      });
-     // await delay(requestDelay); 
-      this.AllUser = this.AllUser.concat(response.data.items).slice(0, 1000);
-      // if (this.AllUser.length < perPage || page==10) {
-      //   break; 
-      // }
-     // page++;
+          },
+        });
 
-    // this.getUsersCommitCounts(); 
-
-},
-    // getUsersCommitCounts() {
-    //   this.AllUser.forEach((user) => {
-    //     Axios
-    //       .get(`https://api.github.com/users/${user.login}/repos`, {
-    //         headers: {
-    //            Accept: 'application/vnd.github.v3+json',
-    //            Authorization: 'Bearer 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',
-    //        },
-    //       })
-    //       .then((response) => {
-    //         const repos = response.data;
-    //         let commitCount = 0;
-          
-    //         repos.forEach((repo) => {
-    //           commitCount += repo.commits;
-    //         });
-    //         console.log(commitCount);
-    //         user.commitCount = commitCount;
-    //       })
-    //       .catch((error) => {
-    //         console.error(error);
-    //       });
-    //   });
-    // },
+        this.AllUser = response.data.items;
+      } catch (error) {
+        console.error(error);
+      }
+    },
 },
   data(){
     return{
