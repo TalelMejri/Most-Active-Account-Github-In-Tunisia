@@ -1,17 +1,27 @@
 <template>
-  <div class="text-center">
-    <input type="text" v-model="search">
-       <div>
-           <table>
-            <thead>
+  <div class="container">
+    <div class="mt-5">
+      <input type="text" v-model="search" class="form-control" placeholder="serach">
+    </div>
+       <div class="mt-3">
+           <table class="table table-stripped">
+            <thead class="text-center">
                <th>
-                <td>id</td>
-                 <td>name</td>
+                  <td>#</td>
                </th>
+                <th>
+                  <td>Name</td>
+                </th>
+                <th>
+                  <td>Image</td>
+                </th>
               </thead>
               <tbody>
-                 <tr v-for="user in mysearch" :key="user.id">
+                 <tr v-for="(user,index) in mysearch" :key="user.id">
+                  <td>{{index+1}}</td>
                     <td>{{user.login}}</td>
+                    <td><img width="100px" :src="user.avatar_url"></td>
+                    <!-- <td>{{user.commitCount}}</td> -->
                  </tr>
               </tbody>
            </table>
@@ -30,38 +40,71 @@ export default {
   },
   methods:{
     async  fetchAllUsers() {
+      const currentDate = new Date();
+      const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+      const sinceDate = firstDayOfMonth.toISOString();
       let page = 1;
       const perPage = 100;
-      const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-      const requestDelay = 500;
-  try {
-    while (true) {
+      /*const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+      const requestDelay = 500;*/
+ 
+   
       const response = await axios.get('https://api.github.com/search/users', {
         params: {
-          //q:"TalelMejri"
+         /* //q:"TalelMejri"
           q: 'location:Tunisia',
           per_page: perPage,
           sort:"commits",
           //sort:"contributions",
-          page,
+          page,*/
+            q: 'location:Tunisia type:user',
+           // sort: 'commits',
+           // sort:"repositories",
+            sort:"contributions",
+            order: 'desc',
+            per_page: 100,
+            since: sinceDate,
+            page:1
         },
         headers: {
-          Accept: 'application/vnd.github.v3+json',
+          Accept: 'application/vnd.github.v10+json',
           Authorization: 'Bearer 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',
         },
       });
-      await delay(requestDelay); 
-      this.AllUser = this.AllUser.concat(response.data.items).slice(0, 200);
-      if (this.AllUser.length < perPage || page==10) {
-        break; 
-      }
-      page++; 
-    }
-    console.log(this.AllUser);
-  } catch (error) {
-    console.error(error);
-  }
+     // await delay(requestDelay); 
+      this.AllUser = this.AllUser.concat(response.data.items).slice(0, 1000);
+      // if (this.AllUser.length < perPage || page==10) {
+      //   break; 
+      // }
+     // page++;
+
+    // this.getUsersCommitCounts(); 
+
 },
+    // getUsersCommitCounts() {
+    //   this.AllUser.forEach((user) => {
+    //     Axios
+    //       .get(`https://api.github.com/users/${user.login}/repos`, {
+    //         headers: {
+    //            Accept: 'application/vnd.github.v3+json',
+    //            Authorization: 'Bearer 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',
+    //        },
+    //       })
+    //       .then((response) => {
+    //         const repos = response.data;
+    //         let commitCount = 0;
+          
+    //         repos.forEach((repo) => {
+    //           commitCount += repo.commits;
+    //         });
+    //         console.log(commitCount);
+    //         user.commitCount = commitCount;
+    //       })
+    //       .catch((error) => {
+    //         console.error(error);
+    //       });
+    //   });
+    // },
 },
   data(){
     return{
